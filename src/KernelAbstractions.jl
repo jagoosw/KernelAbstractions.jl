@@ -3,7 +3,7 @@ module KernelAbstractions
 export @kernel
 export @Const, @localmem, @private, @uniform, @synchronize
 export @index, @groupsize, @ndrange
-export @print
+export @print, @device_error
 export Backend, GPU, CPU
 export synchronize, get_backend, allocate
 
@@ -331,6 +331,21 @@ macro print(items...)
 
     quote
         $__print($(map(esc, args)...))
+    end
+end
+
+"""
+    @device_error(args....)
+
+Unified error throwing to allow error throwing from inside kernels.
+
+Calls `@print` before throwing a `ErrorException` so that it exfiltrates
+`args` from the kernel on all platforms supported by `@print`.
+"""
+macro device_error(args...)
+    quote
+        @print "ERROR: " $(args...) "\n"
+        throw(ErrorException("`@device_error`"))
     end
 end
 
