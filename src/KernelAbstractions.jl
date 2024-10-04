@@ -345,7 +345,7 @@ Calls `@print` before throwing a `ErrorException` so that it exfiltrates
 macro device_error(args...)
     quote
         @print "ERROR: " $(args...) "\n"
-        throw(ErrorException("`@device_error`"))
+        @error "`@device_error`"
     end
 end
 
